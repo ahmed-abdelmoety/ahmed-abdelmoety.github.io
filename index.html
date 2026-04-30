@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Ahmed Monzer — Mechanics Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --border: #222222;
+    --accent: #c8f542;
+    --accent2: #42c8f5;
+    --text: #e8e8e0;
+    --muted: #666660;
+    --faint: #1a1a1a;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    line-height: 1.7;
+    overflow-x: hidden;
+    cursor: crosshair;
+  }
+
+  /* ── CANVAS BACKGROUND ── */
+  #grid-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 3rem;
+    border-bottom: 1px solid var(--border);
+    background: rgba(10,10,10,0.85);
+    backdrop-filter: blur(12px);
+  }
+
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+    text-decoration: none;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--accent); }
+
+  /* ── MAIN WRAPPER ── */
+  main {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 3rem;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 5rem;
+  }
+
+  .hero-tag {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.6s 0.2s forwards;
+  }
+
+  .hero-tag::before {
+    content: '▶ ';
+    font-size: 9px;
+  }
+
+  .hero-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(3rem, 8vw, 6.5rem);
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    opacity: 0;
+    animation: fadeUp 0.7s 0.35s forwards;
+    margin-bottom: 0.5rem;
+  }
+
+  .hero-name span {
+    color: var(--accent);
+    display: block;
+  }
+
+  .hero-sub {
+    font-size: 13px;
+    color: var(--muted);
+    max-width: 520px;
+    margin-top: 1.75rem;
+    opacity: 0;
+    animation: fadeUp 0.7s 0.5s forwards;
+    border-left: 2px solid var(--accent);
+    padding-left: 1rem;
+    line-height: 1.9;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 3rem;
+    margin-top: 3.5rem;
+    opacity: 0;
+    animation: fadeUp 0.7s 0.65s forwards;
+  }
+
+  .stat-item {}
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--accent);
+    display: block;
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-top: 4px;
+    display: block;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 1rem;
+    margin-top: 3rem;
+    opacity: 0;
+    animation: fadeUp 0.7s 0.8s forwards;
+  }
+
+  .btn {
+    padding: 0.7rem 1.75rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-block;
+  }
+
+  .btn:hover {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  .btn-ghost {
+    border-color: var(--border);
+    color: var(--muted);
+  }
+  .btn-ghost:hover {
+    background: var(--faint);
+    color: var(--text);
+    border-color: var(--muted);
+  }
+
+  /* ── SCROLL INDICATOR ── */
+  .scroll-hint {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    opacity: 0;
+    animation: fadeUp 0.7s 1s forwards;
+  }
+
+  .scroll-line {
+    width: 40px;
+    height: 1px;
+    background: var(--muted);
+    animation: lineGrow 1.5s 1.2s infinite;
+  }
+
+  @keyframes lineGrow {
+    0%, 100% { width: 20px; opacity: 0.3; }
+    50% { width: 40px; opacity: 1; }
+  }
+
+  /* ── SECTIONS ── */
+  section {
+    padding: 7rem 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 1.5rem;
+    margin-bottom: 4rem;
+  }
+
+  .section-num {
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 2.5rem;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+
+  /* ── ABOUT ── */
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: start;
+  }
+
+  .about-text p {
+    color: var(--muted);
+    margin-bottom: 1rem;
+    font-size: 13px;
+    line-height: 1.9;
+  }
+
+  .about-text p strong {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .about-sidebar {}
+
+  .info-block {
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    background: var(--faint);
+  }
+
+  .info-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  .info-value {
+    color: var(--text);
+    font-size: 13px;
+  }
+
+  /* ── EXPERIENCE ── */
+  .exp-list { display: flex; flex-direction: column; gap: 0; }
+
+  .exp-item {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 2rem;
+    padding: 2.5rem 0;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+
+  .exp-item::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0;
+    width: 0;
+    height: 100%;
+    background: linear-gradient(to bottom, var(--accent), transparent);
+    opacity: 0.05;
+    transition: width 0.4s;
+  }
+
+  .exp-item:hover::before { width: 4px; }
+
+  .exp-meta {}
+
+  .exp-period {
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .exp-org {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .exp-content {}
+
+  .exp-role {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--text);
+    margin-bottom: 1rem;
+    letter-spacing: -0.01em;
+  }
+
+  .exp-bullets {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .exp-bullets li {
+    font-size: 12px;
+    color: var(--muted);
+    padding-left: 1.25rem;
+    position: relative;
+    line-height: 1.7;
+  }
+
+  .exp-bullets li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-size: 10px;
+  }
+
+  .exp-bullets li strong { color: var(--text); font-weight: 500; }
+
+  /* ── SKILLS ── */
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .skill-cell {
+    background: var(--bg);
+    padding: 1.75rem;
+    transition: background 0.2s;
+  }
+
+  .skill-cell:hover { background: var(--faint); }
+
+  .skill-cat {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  .skill-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .tag {
+    font-size: 11px;
+    padding: 3px 10px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    background: var(--faint);
+    letter-spacing: 0.03em;
+    transition: all 0.2s;
+  }
+
+  .tag:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* ── PROJECTS ── */
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .project-card {
+    background: var(--bg);
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+    text-decoration: none;
+    display: block;
+  }
+
+  .project-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s;
+  }
+
+  .project-card:hover { background: var(--faint); }
+  .project-card:hover::after { transform: scaleX(1); }
+
+  .project-num {
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.12em;
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  .project-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+  }
+
+  .project-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.8;
+    margin-bottom: 1.25rem;
+  }
+
+  .project-tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .project-tool {
+    font-size: 10px;
+    padding: 2px 8px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    background: transparent;
+  }
+
+  .project-card.featured {
+    grid-column: span 2;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .project-card.featured .project-badge {
+    font-size: 10px;
+    padding: 4px 12px;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    height: fit-content;
+  }
+
+  /* ── EDUCATION ── */
+  .edu-list { display: flex; flex-direction: column; gap: 1px; background: var(--border); border: 1px solid var(--border); }
+
+  .edu-item {
+    background: var(--bg);
+    padding: 2rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
+    align-items: center;
+    transition: background 0.2s;
+  }
+
+  .edu-item:hover { background: var(--faint); }
+
+  .edu-degree {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text);
+    margin-bottom: 0.25rem;
+  }
+
+  .edu-school {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .edu-grade {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: var(--accent);
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .edu-grade small {
+    display: block;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 400;
+    color: var(--muted);
+    text-align: right;
+  }
+
+  /* ── PUBLICATION ── */
+  .pub-card {
+    border: 1px solid var(--border);
+    padding: 2rem;
+    background: var(--faint);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .pub-card::before {
+    content: 'Q1';
+    position: absolute;
+    top: 1.5rem; right: 1.5rem;
+    font-family: 'Syne', sans-serif;
+    font-size: 4rem;
+    font-weight: 800;
+    color: var(--accent);
+    opacity: 0.06;
+    line-height: 1;
+  }
+
+  .pub-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+
+  .pub-badge {
+    font-size: 10px;
+    padding: 3px 10px;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .pub-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+  }
+
+  .pub-authors {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+    font-style: italic;
+  }
+
+  .pub-journal {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .pub-doi {
+    display: inline-block;
+    margin-top: 1rem;
+    font-size: 11px;
+    color: var(--accent2);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s;
+  }
+
+  .pub-doi:hover { border-color: var(--accent2); }
+
+  /* ── CONTACT ── */
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: start;
+  }
+
+  .contact-heading {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 3rem;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 1.5rem;
+  }
+
+  .contact-heading span { color: var(--accent); }
+
+  .contact-links { display: flex; flex-direction: column; gap: 1px; }
+
+  .contact-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid var(--border);
+    background: var(--faint);
+    text-decoration: none;
+    color: var(--text);
+    font-size: 13px;
+    transition: all 0.2s;
+    margin-bottom: 1px;
+  }
+
+  .contact-link:hover {
+    border-color: var(--accent);
+    background: rgba(200, 245, 66, 0.04);
+  }
+
+  .contact-link .link-label { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; }
+  .contact-link .link-arrow { color: var(--accent); font-size: 16px; }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+
+  footer p {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── MOBILE ── */
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    main { padding: 0 1.5rem; }
+    .hero-name { font-size: 3rem; }
+    .about-grid, .contact-grid { grid-template-columns: 1fr; gap: 2rem; }
+    .skills-grid { grid-template-columns: 1fr; }
+    .projects-grid { grid-template-columns: 1fr; }
+    .project-card.featured { grid-column: span 1; grid-template-columns: 1fr; }
+    .exp-item { grid-template-columns: 1fr; gap: 0.5rem; }
+    .hero-stats { gap: 2rem; }
+    footer { flex-direction: column; gap: 1rem; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="grid-canvas"></canvas>
+
+<nav>
+  <a class="nav-logo" href="#">A.M.</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero" style="border-top: none;">
+    <p class="hero-tag">MSc Mechanics · TU Darmstadt · Egypt</p>
+    <h1 class="hero-name">
+      Ahmed<span>Monzer</span>
+    </h1>
+    <p class="hero-sub">
+      Computational mechanician working at the intersection of <strong>fracture mechanics</strong>, <strong>material modeling</strong>, and <strong>numerical methods</strong>. Building tools that bridge theory and simulation.
+    </p>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <span class="stat-num">1.65</span>
+        <span class="stat-label">MSc GPA</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">Q1</span>
+        <span class="stat-label">Publication</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">2×</span>
+        <span class="stat-label">HIWI Positions</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">5.4</span>
+        <span class="stat-label">Impact Factor</span>
+      </div>
+    </div>
+    <div class="hero-cta">
+      <a href="#contact" class="btn">Get in touch</a>
+      <a href="https://doi.org/10.1016/J.TSEP.2023.102327" target="_blank" class="btn btn-ghost">View Publication ↗</a>
+    </div>
+    <div class="scroll-hint">
+      <span class="scroll-line"></span>
+      scroll to explore
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="section-header reveal">
+      <span class="section-num">01 /</span>
+      <h2 class="section-title">About</h2>
+    </div>
+    <div class="about-grid reveal">
+      <div class="about-text">
+        <p>I'm a <strong>Master of Mechanics student at TU Darmstadt</strong>, where I also work as a research assistant in two concurrent positions — one focused on experimental plasticity and fracture characterization, and one on building computational tooling for an open-source CFD framework.</p>
+        <p>My academic journey started in Malaysia at UCSI University, where I graduated with <strong>First Class Honors</strong> and a scholarship for academic excellence. My bachelor's thesis on heat exchanger optimization became a <strong>Q1 published paper</strong>.</p>
+        <p>I'm driven by the idea that <strong>good engineering is both precise and creative</strong> — whether that's deriving a constitutive model, automating a documentation pipeline with Python, or designing a clear diagram that makes a complex concept instantly understandable.</p>
+        <p>Open to <strong>PhD opportunities, research collaborations</strong>, and industry roles in computational simulation and structural analysis.</p>
+      </div>
+      <div class="about-sidebar">
+        <div class="info-block">
+          <span class="info-label">Status</span>
+          <span class="info-value">MSc Mechanics — TU Darmstadt<br><span style="color:var(--muted);font-size:12px">Expected Aug 2027</span></span>
+        </div>
+        <div class="info-block">
+          <span class="info-label">Location</span>
+          <span class="info-value">Darmstadt, Germany</span>
+        </div>
+        <div class="info-block">
+          <span class="info-label">Scholarship</span>
+          <span class="info-value">Deutschlandstipendium<br><span style="color:var(--muted);font-size:12px">TU Darmstadt — Academic Excellence</span></span>
+        </div>
+        <div class="info-block">
+          <span class="info-label">Languages</span>
+          <span class="info-value">Arabic (Native) · English (C1) · Deutsch (B1)</span>
+        </div>
+        <div class="info-block">
+          <span class="info-label">Affiliations</span>
+          <span class="info-value" style="font-size:12px;color:var(--muted)">IMechE UK · IEEE HKN · IEM Malaysia · Egyptian Engineering Syndicate</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section id="experience">
+    <div class="section-header reveal">
+      <span class="section-num">02 /</span>
+      <h2 class="section-title">Experience</h2>
+    </div>
+    <div class="exp-list">
+
+      <div class="exp-item reveal">
+        <div class="exp-meta">
+          <span class="exp-period">Dec 2025 — Present</span>
+          <span class="exp-org">Fachgebiet Werkstoffmechanik<br>TU Darmstadt</span>
+        </div>
+        <div class="exp-content">
+          <p class="exp-role">Research Assistant — Plasticity & Fracture</p>
+          <ul class="exp-bullets">
+            <li>Developed experimental datasets for <strong>plasticity and ductile fracture</strong> modeling under axial, torsional, and combined loading</li>
+            <li>Quantified plastic deformation evolution via <strong>ellipse fitting</strong>, aligning experimental behavior with constitutive model assumptions</li>
+            <li>Measured crack growth rates and evaluated stress-rate parameters for downstream numerical simulation</li>
+            <li>Designed figures and diagrams for lecture manuscripts, translating complex theory into precise visual representations</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="exp-item reveal">
+        <div class="exp-meta">
+          <span class="exp-period">Oct 2024 — Present</span>
+          <span class="exp-org">Fachgebiet Strömungsdynamik (FDY)<br>TU Darmstadt</span>
+        </div>
+        <div class="exp-content">
+          <p class="exp-role">Research Assistant — BoSSS CFD Framework</p>
+          <ul class="exp-bullets">
+            <li>Built two Python pipelines to <strong>100% automate</strong> source file conversion into structured Markdown documentation</li>
+            <li>Developed a CI/CD-integrated equation validation tool, cutting manual review workload by <strong>99%</strong></li>
+            <li>Engineered a <strong>GPT-integrated knowledge base</strong> achieving 97% real-time retrieval accuracy for the BoSSS framework</li>
+            <li>Maintains a Jekyll-based GitLab Pages documentation portal with professional structured layout</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="exp-item reveal">
+        <div class="exp-meta">
+          <span class="exp-period">Sep–Dec 2022</span>
+          <span class="exp-org">Thermac Engineering Sdn Bhd<br>Klang, Malaysia</span>
+        </div>
+        <div class="exp-content">
+          <p class="exp-role">Service Engineer (Internship)</p>
+          <ul class="exp-bullets">
+            <li>Assembled and tested <strong>15 Plate Heat Exchangers</strong>; resolved mechanical faults in 9 units via root-cause analysis</li>
+            <li>Managed inventory of 1000+ spare parts; created professional external-facing presentation and product materials</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="exp-item reveal">
+        <div class="exp-meta">
+          <span class="exp-period">Sep–Dec 2020</span>
+          <span class="exp-org">Control Easy Technology Sdn Bhd<br>Puchong, Malaysia</span>
+        </div>
+        <div class="exp-content">
+          <p class="exp-role">Mechanical Design Engineer (Internship)</p>
+          <ul class="exp-bullets">
+            <li>Developed 3D models of two <strong>XYZ Machine Vision System robots</strong> in SolidWorks — one of only two interns trusted with the full project</li>
+            <li>Completed concept-to-execution modeling within 7 weeks, fully meeting technical specifications</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="exp-item reveal">
+        <div class="exp-meta">
+          <span class="exp-period">May 2021 — Nov 2023</span>
+          <span class="exp-org">IMechE UCSI Student Chapter<br>Kuala Lumpur, Malaysia</span>
+        </div>
+        <div class="exp-content">
+          <p class="exp-role">President & Vice-President</p>
+          <ul class="exp-bullets">
+            <li>Led planning and execution of <strong>33 activities</strong> — 18 events, 12 workshops, 1 conference, 1 site visit, 1 competition</li>
+            <li>Chaired and moderated 16 events; mentored junior students in leadership and event planning</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <div class="section-header reveal">
+      <span class="section-num">03 /</span>
+      <h2 class="section-title">Projects</h2>
+    </div>
+    <div class="projects-grid reveal">
+
+      <a class="project-card featured" href="https://doi.org/10.1016/J.TSEP.2023.102327" target="_blank">
+        <div>
+          <span class="project-num">01 — Featured · Published</span>
+          <p class="project-title">U-Tube Heat Exchanger Shell Optimization</p>
+          <p class="project-desc">Proposed and simulated 3 advanced shell geometries using CFD, achieving 24.4% higher thermal performance and 16.25% lower energy consumption vs. conventional cylindrical designs. Published as 1st author in a Q1 Scopus journal (IF 5.4).</p>
+          <div class="project-tools">
+            <span class="project-tool">SolidWorks</span>
+            <span class="project-tool">ANSYS Fluent</span>
+            <span class="project-tool">Thermal Analysis</span>
+            <span class="project-tool">CFD</span>
+          </div>
+        </div>
+        <div><span class="project-badge">Q1 Journal ↗</span></div>
+      </a>
+
+      <div class="project-card">
+        <span class="project-num">02</span>
+        <p class="project-title">BoSSS Documentation & Automation Pipeline</p>
+        <p class="project-desc">End-to-end Python automation of source file conversion into structured Markdown, CI/CD equation validation, and a GPT-powered knowledge base with 97% retrieval accuracy.</p>
+        <div class="project-tools">
+          <span class="project-tool">Python</span>
+          <span class="project-tool">Jekyll</span>
+          <span class="project-tool">GitLab CI/CD</span>
+          <span class="project-tool">GPT API</span>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <span class="project-num">03</span>
+        <p class="project-title">Plasticity Material Model — Experimental Dataset</p>
+        <p class="project-desc">Experimental program for ductile fracture characterization: ellipse fitting for plastic deformation, crack growth measurement, and stress-rate evaluation under multi-axial loading.</p>
+        <div class="project-tools">
+          <span class="project-tool">MATLAB</span>
+          <span class="project-tool">Python</span>
+          <span class="project-tool">Abaqus</span>
+          <span class="project-tool">Lab Experiments</span>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <span class="project-num">04</span>
+        <p class="project-title">Movable Waterwheel — Hydroelectric Prototype</p>
+        <p class="project-desc">Portable hydroelectric system concept delivering continuous 8h power output per battery cycle. Modeled from scratch for off-grid energy accessibility.</p>
+        <div class="project-tools">
+          <span class="project-tool">SolidWorks</span>
+          <span class="project-tool">Energy Systems</span>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <span class="project-num">05</span>
+        <p class="project-title">Smart Follower Trolley for Elderly Care</p>
+        <p class="project-desc">Robotic shopping trolley with vest-tracking capability supporting 10 kg load, maintaining ±0.5m tracking distance — eliminating physical strain for elderly users.</p>
+        <div class="project-tools">
+          <span class="project-tool">Robotics</span>
+          <span class="project-tool">SolidWorks</span>
+          <span class="project-tool">Tracking Systems</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <div class="section-header reveal">
+      <span class="section-num">04 /</span>
+      <h2 class="section-title">Skills</h2>
+    </div>
+    <div class="skills-grid reveal">
+      <div class="skill-cell">
+        <span class="skill-cat">Simulation & FEA</span>
+        <div class="skill-tags">
+          <span class="tag">ANSYS Fluent</span>
+          <span class="tag">ANSYS Structural</span>
+          <span class="tag">Abaqus</span>
+          <span class="tag">FEniCSx</span>
+          <span class="tag">Thermal Analysis</span>
+        </div>
+      </div>
+      <div class="skill-cell">
+        <span class="skill-cat">CAD & Design</span>
+        <div class="skill-tags">
+          <span class="tag">SolidWorks</span>
+          <span class="tag">Fusion 360</span>
+          <span class="tag">AutoCAD</span>
+          <span class="tag">Inkscape</span>
+          <span class="tag">Adobe Illustrator</span>
+        </div>
+      </div>
+      <div class="skill-cell">
+        <span class="skill-cat">Programming</span>
+        <div class="skill-tags">
+          <span class="tag">Python</span>
+          <span class="tag">MATLAB</span>
+          <span class="tag">LaTeX</span>
+          <span class="tag">Git</span>
+          <span class="tag">CI/CD</span>
+        </div>
+      </div>
+      <div class="skill-cell">
+        <span class="skill-cat">Engineering Analysis</span>
+        <div class="skill-tags">
+          <span class="tag">Fracture Mechanics</span>
+          <span class="tag">Plasticity</span>
+          <span class="tag">Fatigue</span>
+          <span class="tag">Nonlinear Materials</span>
+          <span class="tag">Numerical Methods</span>
+        </div>
+      </div>
+      <div class="skill-cell">
+        <span class="skill-cat">Documentation</span>
+        <div class="skill-tags">
+          <span class="tag">Jekyll</span>
+          <span class="tag">Markdown</span>
+          <span class="tag">GitLab Pages</span>
+          <span class="tag">Technical Writing</span>
+        </div>
+      </div>
+      <div class="skill-cell">
+        <span class="skill-cat">Research Methods</span>
+        <div class="skill-tags">
+          <span class="tag">Experimental Design</span>
+          <span class="tag">Data Analysis</span>
+          <span class="tag">Scientific Writing</span>
+          <span class="tag">Diagram Design</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PUBLICATION -->
+  <section id="publication">
+    <div class="section-header reveal">
+      <span class="section-num">05 /</span>
+      <h2 class="section-title">Publication</h2>
+    </div>
+    <div class="pub-card reveal">
+      <div class="pub-meta">
+        <span class="pub-badge">Q1 Journal</span>
+        <span class="pub-badge">1st Author</span>
+        <span class="pub-badge">IF 5.4</span>
+        <span class="pub-badge">Scopus H-Index 67</span>
+      </div>
+      <p class="pub-title">Numerical investigations on optimised shell designs of a U-tube heat exchanger</p>
+      <p class="pub-authors">A. M. Abdelmoety et al. (2024)</p>
+      <p class="pub-journal">Thermal Science and Engineering Progress, Vol. 47, 102327 · Elsevier · ScienceDirect</p>
+      <a class="pub-doi" href="https://doi.org/10.1016/J.TSEP.2023.102327" target="_blank">DOI: 10.1016/J.TSEP.2023.102327 ↗</a>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="contact-grid">
+      <div class="reveal">
+        <h2 class="contact-heading">Let's<span><br>Connect.</span></h2>
+        <p style="color:var(--muted);font-size:13px;max-width:320px;line-height:1.9;margin-top:1rem">
+          Whether you're looking for a researcher, collaborator, or engineer — I'd be glad to hear from you.
+        </p>
+      </div>
+      <div class="contact-links reveal">
+        <a class="contact-link" href="mailto:ahmedmahmoud.am780@gmail.com">
+          <div>
+            <span class="link-label">Email</span>
+            <div>ahmedmahmoud.am780@gmail.com</div>
+          </div>
+          <span class="link-arrow">↗</span>
+        </a>
+        <a class="contact-link" href="https://linkedin.com/in/ahmed-monzer" target="_blank">
+          <div>
+            <span class="link-label">LinkedIn</span>
+            <div>linkedin.com/in/ahmed-monzer</div>
+          </div>
+          <span class="link-arrow">↗</span>
+        </a>
+        <a class="contact-link" href="https://doi.org/10.1016/J.TSEP.2023.102327" target="_blank">
+          <div>
+            <span class="link-label">Publication</span>
+            <div>Thermal Science & Engineering Progress</div>
+          </div>
+          <span class="link-arrow">↗</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p>© 2025 Ahmed Monzer · TU Darmstadt</p>
+  <p style="color:var(--accent)">MSc Mechanics · Open to Opportunities</p>
+</footer>
+
+<script>
+// ── ANIMATED GRID CANVAS ──
+const canvas = document.getElementById('grid-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, cols, rows, nodes = [], mouse = { x: -999, y: -999 };
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  cols = Math.floor(W / 60);
+  rows = Math.floor(H / 60);
+  nodes = [];
+  for (let i = 0; i <= cols; i++) {
+    for (let j = 0; j <= rows; j++) {
+      nodes.push({
+        bx: (i / cols) * W,
+        by: (j / rows) * H,
+        x: (i / cols) * W,
+        y: (j / rows) * H,
+        vx: 0, vy: 0
+      });
+    }
+  }
+}
+
+window.addEventListener('resize', resize);
+resize();
+
+window.addEventListener('mousemove', e => {
+  mouse.x = e.clientX;
+  mouse.y = e.clientY;
+});
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+
+  const radius = 120;
+  nodes.forEach(n => {
+    const dx = mouse.x - n.bx;
+    const dy = mouse.y - n.by;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const force = Math.max(0, (radius - dist) / radius);
+    const tx = n.bx - dx * force * 0.3;
+    const ty = n.by - dy * force * 0.3;
+    n.x += (tx - n.x) * 0.12;
+    n.y += (ty - n.y) * 0.12;
+  });
+
+  const colsP1 = cols + 1;
+  ctx.strokeStyle = '#c8f542';
+  ctx.lineWidth = 0.4;
+
+  for (let i = 0; i < cols; i++) {
+    for (let j = 0; j < rows; j++) {
+      const tl = nodes[i * (rows + 1) + j];
+      const tr = nodes[(i + 1) * (rows + 1) + j];
+      const bl = nodes[i * (rows + 1) + j + 1];
+
+      ctx.beginPath();
+      ctx.moveTo(tl.x, tl.y);
+      ctx.lineTo(tr.x, tr.y);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(tl.x, tl.y);
+      ctx.lineTo(bl.x, bl.y);
+      ctx.stroke();
+    }
+  }
+
+  nodes.forEach(n => {
+    const dx = n.x - n.bx;
+    const dy = n.y - n.by;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist > 2) {
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, 1.5, 0, Math.PI * 2);
+      ctx.fillStyle = '#c8f542';
+      ctx.fill();
+    }
+  });
+
+  requestAnimationFrame(draw);
+}
+draw();
+
+// ── SCROLL REVEAL ──
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
