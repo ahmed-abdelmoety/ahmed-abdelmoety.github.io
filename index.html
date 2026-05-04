@@ -381,7 +381,36 @@
   }
 
   .exp-bullets li strong { color: var(--text); font-weight: 500; }
-
+  
+  .exp-bullets ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    padding-left: 1.25rem;
+  }
+  
+  .exp-bullets ul li {
+    font-size: 12px;
+    color: var(--muted);
+    padding-left: 1.25rem;
+    position: relative;
+    line-height: 1.7;
+  }
+  
+  .exp-bullets ul li::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-size: 12px;
+  }
+  
+  .exp-bullets ul ul li::before {
+    content: '·';
+    color: var(--muted);
+  }
   /* ── SKILLS ── */
   .skills-grid {
     display: grid;
@@ -867,9 +896,9 @@
           <ul class="exp-bullets">
             <li>Assembled and tested 15 Plate Heat Exchangers (PHEs), conducting post-assembly evaluations to verify proper functionality and ensure compliance with performance and quality standards.</li>
             <li>Resolved mechanical faults in 9 units through systematic root-cause analysis, restoring proper functionality and improving operational efficiency while upholding strict safety protocols.</li>
-            <li>Managed inventory of 1000+ spare parts and tools, ensuring full availability and seamless maintenance operations.<li>
-            <li>Created high-quality, professional, and visually compelling external-facing presentation materials, including a full company profile and detailed product decks that effectively represent the company and showcase its capabilities, products, and services to clients and partners, fully aligned with branding, communication objectives, and stakeholder expectations.<li>
-            <li>Liaised with management, technicians, and on-site clients to ensure clear communication, smooth coordination, and timely resolution of technical and operational issues.<li>
+            <li>Managed inventory of 1000+ spare parts and tools, ensuring full availability and seamless maintenance operations.</li>
+            <li>Created high-quality, professional, and visually compelling external-facing presentation materials, including a full company profile and detailed product decks that effectively represent the company and showcase its capabilities, products, and services to clients and partners, fully aligned with branding, communication objectives, and stakeholder expectations.</li>
+            <li>Liaised with management, technicians, and on-site clients to ensure clear communication, smooth coordination, and timely resolution of technical and operational issues.</li>
           </ul>
         </div>
       </div>
